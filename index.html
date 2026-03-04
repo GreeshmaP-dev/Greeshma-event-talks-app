@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Talks Today</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        #search {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .schedule-item {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .time {
+            width: 100px;
+            font-weight: bold;
+        }
+        .talk {
+            flex-grow: 1;
+            border-left: 3px solid #007BFF;
+            padding-left: 15px;
+        }
+        .talk h2 {
+            margin-top: 0;
+        }
+        .talk .speakers {
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        .talk .categories span {
+            background: #007BFF;
+            color: #fff;
+            padding: 3px 7px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-right: 5px;
+        }
+        .break {
+            font-style: italic;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Tech Talks Today</h1>
+        <input type="text" id="search" placeholder="Search by category...">
+        <div id="schedule"></div>
+    </div>
+
+    <script>
+        const talks = [
+            {
+                title: "The Future of JavaScript",
+                speakers: ["Jane Doe"],
+                categories: ["JavaScript", "Web Development"],
+                duration: 60,
+                description: "An in-depth look at the upcoming features of JavaScript and how they will shape the future of web development."
+            },
+            {
+                title: "Advanced CSS Techniques",
+                speakers: ["John Smith"],
+                categories: ["CSS", "Frontend"],
+                duration: 60,
+                description: "Learn about modern CSS features like Grid, Flexbox, and custom properties to create complex and responsive layouts."
+            },
+            {
+                title: "Building Scalable APIs with Node.js",
+                speakers: ["Emily Jones", "Mike Brown"],
+                categories: ["Node.js", "Backend", "API"],
+                duration: 60,
+                description: "A comprehensive guide to building scalable and maintainable RESTful APIs using Node.js and Express."
+            },
+            {
+                title: "Introduction to Machine Learning",
+                speakers: ["Chris Wilson"],
+                categories: ["Machine Learning", "AI"],
+                duration: 60,
+                description: "A beginner-friendly introduction to the core concepts of machine learning and its applications."
+            },
+            {
+                title: "State Management in React",
+                speakers: ["Patricia Williams"],
+                categories: ["React", "JavaScript", "Frontend"],
+                duration: 60,
+                description: "Exploring different state management solutions in React, from local component state to global solutions like Redux and Context API."
+            },
+            {
+                title: "DevOps for Developers",
+                speakers: ["David Miller"],
+                categories: ["DevOps", "CI/CD"],
+                duration: 60,
+                description: "An overview of DevOps principles and practices that every developer should know to ship better software faster."
+            }
+        ];
+
+        const scheduleContainer = document.getElementById('schedule');
+        const searchInput = document.getElementById('search');
+
+        function formatTime(date) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function renderSchedule(filter = '') {
+            scheduleContainer.innerHTML = '';
+            let currentTime = new Date();
+            currentTime.setHours(10, 0, 0, 0);
+
+            const filteredTalks = talks.filter(talk => 
+                talk.categories.some(category => category.toLowerCase().includes(filter.toLowerCase()))
+            );
+
+            let talksRendered = 0;
+
+            for (let i = 0; i < talks.length; i++) {
+                if (talksRendered === 3) {
+                    const lunchStartTime = new Date(currentTime.getTime());
+                    currentTime.setHours(currentTime.getHours() + 1);
+                    const lunchEndTime = new Date(currentTime.getTime());
+
+                    const scheduleItem = document.createElement('div');
+                    scheduleItem.className = 'schedule-item';
+                    scheduleItem.innerHTML = `
+                        <div class="time">${formatTime(lunchStartTime)} - ${formatTime(lunchEndTime)}</div>
+                        <div class="talk break">Lunch Break</div>
+                    `;
+                    scheduleContainer.appendChild(scheduleItem);
+
+                     // Add transition after lunch
+                    const transitionAfterLunchStartTime = new Date(currentTime.getTime());
+                    currentTime.setMinutes(currentTime.getMinutes() + 10);
+                    const transitionAfterLunchEndTime = new Date(currentTime.getTime());
+                    const transitionAfterLunchItem = document.createElement('div');
+                    transitionAfterLunchItem.className = 'schedule-item';
+                    transitionAfterLunchItem.innerHTML = `
+                        <div class="time">${formatTime(transitionAfterLunchStartTime)} - ${formatTime(transitionAfterLunchEndTime)}</div>
+                        <div class="talk break">Transition</div>
+                    `;
+                    scheduleContainer.appendChild(transitionAfterLunchItem);
+                }
+
+                const talk = talks[i];
+
+                if (filteredTalks.includes(talk)) {
+                    const talkStartTime = new Date(currentTime.getTime());
+                    currentTime.setMinutes(currentTime.getMinutes() + talk.duration);
+                    const talkEndTime = new Date(currentTime.getTime());
+
+                    const scheduleItem = document.createElement('div');
+                    scheduleItem.className = 'schedule-item';
+                    scheduleItem.innerHTML = `
+                        <div class="time">${formatTime(talkStartTime)} - ${formatTime(talkEndTime)}</div>
+                        <div class="talk">
+                            <h2>${talk.title}</h2>
+                            <div class="speakers">${talk.speakers.join(', ')}</div>
+                            <div class="description">${talk.description}</div>
+                            <div class="categories">
+                                ${talk.categories.map(cat => `<span>${cat}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                    scheduleContainer.appendChild(scheduleItem);
+                    talksRendered++;
+                }
+
+                if (i < talks.length -1 && talksRendered !== 3 && talksRendered > 0) {
+                     // Add transition
+                    const transitionStartTime = new Date(currentTime.getTime());
+                    currentTime.setMinutes(currentTime.getMinutes() + 10);
+                    const transitionEndTime = new Date(currentTime.getTime());
+                    const transitionItem = document.createElement('div');
+                    transitionItem.className = 'schedule-item';
+                    transitionItem.innerHTML = `
+                        <div class="time">${formatTime(transitionStartTime)} - ${formatTime(transitionEndTime)}</div>
+                        <div class="talk break">Transition</div>
+                    `;
+                    scheduleContainer.appendChild(transitionItem);
+                }
+            }
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            renderSchedule(e.target.value);
+        });
+
+        renderSchedule();
+
+    </script>
+</body>
+</html>

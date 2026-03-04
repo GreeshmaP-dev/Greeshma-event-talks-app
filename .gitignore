@@ -1,0 +1,14 @@
+# Node.js
+node_modules/
+
+# Environment variables
+.env
+
+# Gemini CLI internal directory
+.gemini/
+
+# Log files
+*.log
+
+# Python cache (for simple http server)
+__pycache__/
